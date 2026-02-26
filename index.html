@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Gym Tracker Pro - Entrenamiento Inteligente</title>
+    <title>Gym Tracker - Entrenamiento Inteligente</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -677,7 +677,7 @@
             </div>
 
             <button onclick="startDemoApp()" style="width:100%; padding:18px; border-radius:14px; background:linear-gradient(135deg,#667eea,#764ba2); color:white; font-weight:700; font-size:18px; border:none; cursor:pointer; box-shadow:0 10px 30px rgba(102,126,234,0.4); font-family:'Outfit',sans-serif; margin-bottom:12px;">
-                🚀 Comenzar Tour Guiado
+                Comenzar Tour Guiado
             </button>
             <button onclick="skipTourAndEnter()" style="width:100%; padding:14px; border-radius:14px; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.6); font-weight:600; font-size:15px; border:1px solid rgba(255,255,255,0.15); cursor:pointer; font-family:'Outfit',sans-serif;">
                 Explorar sin guía →
@@ -714,55 +714,40 @@
                         </button>
                     </div>
                     <h1 class="text-5xl font-bold text-white mb-4">
-                        💪 AI Gym Tracker Pro
-                        <span class="ai-badge">✨ AI-POWERED</span>
+                        Gym Tracker
                     </h1>
                     <p class="text-white/70 text-xl font-light">Tu asistente inteligente de entrenamiento</p>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8" id="mainMenuGrid">
                     <button onclick="showView('selectRoutine')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_workout">
-                        <span class="text-4xl mb-3">🏋️</span>
+                        <span class="text-4xl mb-3"></span>
                         <span>Nuevo Entrenamiento</span>
                         <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Selecciona una rutina y registra tus series, pesos y repeticiones de cada ejercicio.">?<span class="help-tooltip">Selecciona una rutina y registra tus series, pesos y repeticiones de cada ejercicio.</span></span>
                     </button>
                     <button onclick="showView('addExercises')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_addEx">
-                        <span class="text-4xl mb-3">➕</span>
+                        <span class="text-4xl mb-3"></span>
                         <span>Agregar Ejercicios</span>
                         <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Crea nuevos ejercicios y agrégalos a tus rutinas existentes o crea una rutina nueva.">?<span class="help-tooltip">Crea nuevos ejercicios y agrégalos a tus rutinas existentes o crea una rutina nueva.</span></span>
                     </button>
                     <button onclick="showManagement()" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_manage">
-                        <span class="text-4xl mb-3">⚙️</span>
+                        <span class="text-4xl mb-3"></span>
                         <span>Gestionar Rutinas</span>
                         <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Edita, elimina o reorganiza tus rutinas y los ejercicios dentro de cada una.">?<span class="help-tooltip">Edita, elimina o reorganiza tus rutinas y los ejercicios dentro de cada una.</span></span>
                     </button>
                     <button onclick="showView('history')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_history">
-                        <span class="text-4xl mb-3">📊</span>
+                        <span class="text-4xl mb-3"></span>
                         <span>Historial</span>
                         <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Consulta todos tus entrenamientos anteriores. Puedes editarlos, eliminarlos o exportarlos en PDF.">?<span class="help-tooltip">Consulta todos tus entrenamientos anteriores. Puedes editarlos, eliminarlos o exportarlos en PDF.</span></span>
                     </button>
-                    <button onclick="showView('analytics')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_analytics">
-                        <span class="text-4xl mb-3">📈</span>
-                        <span>Análisis IA</span>
-                        <span class="ai-badge">NUEVO</span>
-                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="La IA analiza tu historial y genera gráficas de progreso, volumen total y puntos de mejora.">?<span class="help-tooltip">La IA analiza tu historial y genera gráficas de progreso, volumen total y puntos de mejora.</span></span>
-                    </button>
-                    <button onclick="showView('aiRecommendations')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_recs">
-                        <span class="text-4xl mb-3">🤖</span>
-                        <span>Recomendaciones</span>
-                        <span class="ai-badge">NUEVO</span>
-                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="El asistente IA genera recomendaciones personalizadas basadas en tus últimas sesiones y metas.">?<span class="help-tooltip">El asistente IA genera recomendaciones personalizadas basadas en tus últimas sesiones y metas.</span></span>
-                    </button>
                     <button onclick="showView('predictions')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_pred">
-                        <span class="text-4xl mb-3">🔮</span>
+                        <span class="text-4xl mb-3"></span>
                         <span>Predicción</span>
-                        <span class="ai-badge">NUEVO</span>
                         <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Usa regresión polinomial y series de tiempo para predecir tu 1RM y progreso en las próximas sesiones.">?<span class="help-tooltip">Usa regresión polinomial y series de tiempo para predecir tu 1RM y progreso en las próximas sesiones.</span></span>
                     </button>
                     <button onclick="showView('calories')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_cal">
-                        <span class="text-4xl mb-3">🍎</span>
+                        <span class="text-4xl mb-3"></span>
                         <span>Contador Calorías</span>
-                        <span class="ai-badge">NUEVO</span>
                         <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Escribe un alimento o toma una foto con la cámara y la IA calcula calorías, proteínas, carbos y grasas.">?<span class="help-tooltip">Escribe un alimento o toma una foto con la cámara y la IA calcula calorías, proteínas, carbos y grasas.</span></span>
                     </button>
                 </div>
