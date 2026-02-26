@@ -582,10 +582,16 @@ function renderTourStep() {
         const el = document.getElementById(step.target);
         if (el) {
             const rect = el.getBoundingClientRect();
-            const bw = 320, bh = 200;
+            const bw = 320, bh = 260;
             let top, left;
 
-            if (step.arrow === 'arrow-bottom') {
+            const isNearRight =  rect.right > window.innerWidth * 0.7;
+            const isNearBottom = rect.bottom > window.innerHeight * 0.7;
+
+            if (isNearRight && isNearBottom) {
+                top = rect.top - bh - 20;
+                left = rect.left - bw - 20;
+            } else if (step.arrow === 'arrow-bottom') {
                 top = rect.top - bh - 20;
                 left = rect.left + rect.width / 2 - bw / 2;
             } else if (step.arrow === 'arrow-top') {
