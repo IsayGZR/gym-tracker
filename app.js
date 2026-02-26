@@ -843,7 +843,7 @@ function renderHistoryMenu() {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-6">
             <button onclick="showHistoryView()" 
                     class="bg-blue-500 text-white p-8 rounded-xl text-xl font-semibold hover:shadow-lg transform hover:-translate-y-1 transition">
-                👁️ Ver Historial
+                Ver Historial
             </button>
             <button onclick="showEditHistory()" 
                     class="bg-green-500 text-white p-8 rounded-xl text-xl font-semibold hover:shadow-lg transform hover:-translate-y-1 transition">

@@ -541,7 +541,7 @@
             <div style="background:linear-gradient(135deg,rgba(102,126,234,0.15),rgba(118,75,162,0.15)); border:1px solid rgba(102,126,234,0.3); border-radius:16px; padding:20px; margin-top:10px;">
                 <p style="color:rgba(255,255,255,0.8); font-size:15px; margin-bottom:14px;">Explora todas las funciones sin necesidad de cuenta, </p>
                 <button onclick="enterDemoMode()" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:14px 32px; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; font-family:'Outfit',sans-serif; box-shadow:0 8px 25px rgba(102,126,234,0.4); width:100%;">
-                    🎮 Explorar Versión Demo
+                    Explorar Versión Demo
                 </button>
             </div>
         </div>
@@ -639,7 +639,7 @@
 
             <!-- Botón Demo -->
             <button class="btn-demo" onclick="enterDemoMode()">
-                🎮 Explorar Demo <span class="text-white/50 font-normal text-sm ml-1">· Sin cuenta necesaria</span>
+                Explorar Demo <span class="text-white/50 font-normal text-sm ml-1">· Sin cuenta necesaria</span>
             </button>
 
         </div>
@@ -697,7 +697,7 @@
 
     <!-- Banner modo demo -->
     <div id="demoBanner" class="hidden">
-        🎮 Estás en <strong>Modo Demo</strong> — Los datos son de ejemplo y no se guardan.
+        Estás en <strong>Modo Demo</strong> — Los datos son de ejemplo y no se guardan.
         <button onclick="logout()" class="ml-3 underline font-normal opacity-80 hover:opacity-100">← Volver al login</button>
     </div>
 
@@ -764,7 +764,7 @@
                         </div>
                         <div class="flex gap-2">
                             <button onclick="showApiKeyManager()" class="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition font-semibold text-sm">
-                                ⚙️ Configurar
+                                Configurar
                             </button>
                         </div>
                     </div>
@@ -866,7 +866,7 @@
 
             <!-- HISTORIAL -->
             <div id="history" class="hidden fade-in">
-                <h1 class="text-3xl font-bold text-white mb-8 text-center">📊 Historial de Entrenamientos</h1>
+                <h1 class="text-3xl font-bold text-white mb-8 text-center">Historial de Entrenamientos</h1>
                 <div id="historyContainer">
                     <!-- Se llenará dinámicamente -->
                 </div>
@@ -887,7 +887,7 @@
             <!-- PREDICCIONES IA -->
             <div id="predictions" class="hidden fade-in">
                 <h1 class="text-4xl font-bold text-white mb-2 text-center">
-                    🔮 Predicción de Rendimiento
+                    Predicción de Rendimiento
                 </h1>
                 <p class="text-white/60 text-center mb-8">Basado en tu historial real usando regresión polinomial</p>
 
@@ -907,7 +907,7 @@
                             <option value="8">+8 sesiones</option>
                         </select>
                         <button onclick="runPrediction()" class="btn-primary">
-                            🔮 Predecir
+                            Predecir
                         </button>
                     </div>
                 </div>
@@ -922,7 +922,7 @@
 
             <!-- CONTADOR DE CALORÍAS -->
             <div id="calories" class="hidden fade-in">
-                <h1 class="text-4xl font-bold text-white mb-2 text-center">🍎 Contador de Calorías</h1>
+                <h1 class="text-4xl font-bold text-white mb-2 text-center">Contador de Calorías</h1>
                 <p class="text-white/60 text-center mb-8">Escribe un alimento y obtén su información nutricional</p>
 
                 <!-- Tabs texto / cámara -->
@@ -1114,7 +1114,7 @@
                         <li>Si funciona, click en "Guardar"</li>
                     </ol>
                     <p class="text-xs text-green-600 mt-3 font-semibold">
-                        ✨ Gemini es 100% GRATIS con límites muy generosos
+                        Gemini es 100% GRATIS  
                     </p>
                 </div>
             </div>
@@ -1126,7 +1126,7 @@
         <div id="aiChatBox" class="hidden" style="display: none;">
             <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 flex justify-between items-center">
                 <div>
-                    <h3 class="font-bold text-lg">🤖 Asistente IA</h3>
+                    <h3 class="font-bold text-lg">Asistente IA</h3>
                     <p class="text-sm opacity-80">Pregúntame lo que quieras</p>
                 </div>
                 <button onclick="toggleChat()" class="text-white hover:bg-white/20 rounded-lg p-2 transition">
@@ -1662,7 +1662,7 @@ Usa emojis y sé específico y motivador.`;
     function updateUserDisplay() {
         const el = document.getElementById('userEmailDisplay');
         if (el && currentUser) {
-            el.textContent = appMode === 'demo' ? '🎮 Demo' : currentUser.email;
+            el.textContent = appMode === 'demo' ? 'Demo' : currentUser.email;
         }
     }
     window.updateUserDisplay = updateUserDisplay;
