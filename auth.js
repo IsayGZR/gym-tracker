@@ -448,6 +448,12 @@ function enterDemoMode() {
     workoutHistory = JSON.parse(JSON.stringify(DEMO_DATA.workoutHistory));
     draftWorkouts = {};
 
+    // Convertir fechas de YYYY-MM-DD a DD/MM/YYYY
+    workoutHistory = workoutHistory.map(w => ({
+        ...w,
+        date: w.date.split('-').reverse().join('/')
+    }));
+
     // Ocultar login, mostrar pantalla bienvenida
     const loginScreen = document.getElementById('loginScreen');
     const welcomeScreen = document.getElementById('demoWelcomeScreen');
