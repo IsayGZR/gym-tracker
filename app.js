@@ -63,6 +63,11 @@ async function saveData() {
 
 // ==================== CARGAR DATOS DESDE LA NUBE ====================
 async function loadStateFromCloud() {
+    // 🚫 En modo demo no cargar desde AWS
+    if (typeof appMode !== 'undefined' && appMode === 'demo') {
+        console.log('🎮 Modo demo: carga desde AWS bloqueada');
+        return false;
+    }
     // Solo cargar desde AWS, ignorar localStorage
     if (STATE_API_URL && !STATE_API_URL.includes("TU_URL")) {
         try {
