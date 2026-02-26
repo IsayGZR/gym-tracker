@@ -470,6 +470,7 @@ function enterDemoMode() {
 }
 
 function startDemoApp() {
+    appMode = 'demo'; 
     document.getElementById('demoWelcomeScreen').style.display = 'none';
     document.getElementById('demoWelcomeScreen').classList.add('hidden');
     showMainApp();
