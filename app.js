@@ -1584,14 +1584,14 @@ async function runPrediction() {
 
             <!-- Predicciones -->
             <div class="glass-card p-6">
-                <h3 class="text-white font-bold text-lg mb-4">🔮 Predicciones próximas ${sessionsAhead} sesiones</h3>
+                <h3 class="text-white font-bold text-lg mb-4">Predicciones próximas ${sessionsAhead} sesiones</h3>
                 <div class="space-y-2">${predictionsHTML}</div>
                 <p class="text-white/40 text-xs mt-4">* 1RM estimado con fórmula de Epley (peso × (1 + reps/30)). Basado en ${data.sessions_analyzed} sesiones analizadas.</p>
             </div>
 
             <!-- Historial reciente -->
             <div class="glass-card p-6">
-                <h3 class="text-white font-bold text-lg mb-4">📊 Últimas sesiones de ${exerciseName}</h3>
+                <h3 class="text-white font-bold text-lg mb-4">Últimas sesiones de ${exerciseName}</h3>
                 <div class="space-y-2">${historicalHTML}</div>
             </div>
         `;
