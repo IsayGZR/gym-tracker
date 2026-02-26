@@ -74,71 +74,127 @@ const DEMO_DATA = {
     },
     workoutHistory: [
         {
-            id: "demo_1", date: "2025-12-01", routine: "pecho_triceps",
+            id: "demo_1", date: "2025-11-01", routine: "pecho_triceps",
             exercises: [
-                { name: "Press Banca", series: [{weight: 60, reps: 10}, {weight: 65, reps: 8}, {weight: 70, reps: 6}] },
-                { name: "Press Inclinado", series: [{weight: 50, reps: 10}, {weight: 55, reps: 8}, {weight: 55, reps: 7}] },
-                { name: "Extensión Tríceps", series: [{weight: 20, reps: 12}, {weight: 22, reps: 10}, {weight: 22, reps: 10}] }
+                { name: "Press Banca con Barra", series: [{weight:60,reps:10},{weight:65,reps:8},{weight:67.5,reps:6}] },
+                { name: "Press Inclinado con Mancuernas", series: [{weight:24,reps:10},{weight:26,reps:8},{weight:26,reps:7}] },
+                { name: "Extensión Tríceps en Polea", series: [{weight:20,reps:12},{weight:22,reps:10},{weight:22,reps:10}] }
             ]
         },
         {
-            id: "demo_2", date: "2025-12-04", routine: "espalda_biceps",
+            id: "demo_2", date: "2025-11-04", routine: "espalda_biceps",
             exercises: [
-                { name: "Jalón al Pecho", series: [{weight: 55, reps: 12}, {weight: 60, reps: 10}, {weight: 65, reps: 8}] },
-                { name: "Remo con Barra", series: [{weight: 60, reps: 10}, {weight: 65, reps: 8}, {weight: 65, reps: 8}] },
-                { name: "Curl Bíceps", series: [{weight: 14, reps: 12}, {weight: 16, reps: 10}, {weight: 16, reps: 9}] }
+                { name: "Jalón al Pecho", series: [{weight:55,reps:12},{weight:60,reps:10},{weight:62.5,reps:8}] },
+                { name: "Remo con Barra", series: [{weight:60,reps:10},{weight:65,reps:8},{weight:65,reps:7}] },
+                { name: "Curl Bíceps con Barra", series: [{weight:30,reps:12},{weight:32.5,reps:10},{weight:32.5,reps:9}] }
             ]
         },
         {
-            id: "demo_3", date: "2025-12-06", routine: "pierna",
+            id: "demo_3", date: "2025-11-06", routine: "pierna",
             exercises: [
-                { name: "Sentadilla", series: [{weight: 80, reps: 10}, {weight: 90, reps: 8}, {weight: 95, reps: 6}] },
-                { name: "Prensa", series: [{weight: 120, reps: 12}, {weight: 130, reps: 10}, {weight: 140, reps: 8}] },
-                { name: "Femoral Tumbado", series: [{weight: 35, reps: 12}, {weight: 40, reps: 10}, {weight: 40, reps: 10}] }
+                { name: "Sentadilla con Barra", series: [{weight:80,reps:10},{weight:90,reps:8},{weight:95,reps:6}] },
+                { name: "Prensa de Piernas", series: [{weight:120,reps:12},{weight:130,reps:10},{weight:140,reps:8}] },
+                { name: "Femoral Tumbado", series: [{weight:35,reps:12},{weight:37.5,reps:10},{weight:37.5,reps:9}] }
             ]
         },
         {
-            id: "demo_4", date: "2025-12-09", routine: "pecho_triceps",
+            id: "demo_4", date: "2025-11-09", routine: "pecho_triceps",
             exercises: [
-                { name: "Press Banca", series: [{weight: 65, reps: 10}, {weight: 70, reps: 8}, {weight: 72.5, reps: 6}] },
-                { name: "Press Inclinado", series: [{weight: 52.5, reps: 10}, {weight: 57.5, reps: 8}, {weight: 57.5, reps: 7}] },
-                { name: "Extensión Tríceps", series: [{weight: 22, reps: 12}, {weight: 24, reps: 10}, {weight: 24, reps: 9}] }
+                { name: "Press Banca con Barra", series: [{weight:62.5,reps:10},{weight:67.5,reps:8},{weight:70,reps:6}] },
+                { name: "Press Inclinado con Mancuernas", series: [{weight:26,reps:10},{weight:28,reps:8},{weight:28,reps:7}] },
+                { name: "Extensión Tríceps en Polea", series: [{weight:22,reps:12},{weight:24,reps:10},{weight:24,reps:9}] }
             ]
         },
         {
-            id: "demo_5", date: "2025-12-12", routine: "espalda_biceps",
+            id: "demo_5", date: "2025-11-12", routine: "espalda_biceps",
             exercises: [
-                { name: "Jalón al Pecho", series: [{weight: 60, reps: 12}, {weight: 65, reps: 10}, {weight: 67.5, reps: 8}] },
-                { name: "Remo con Barra", series: [{weight: 65, reps: 10}, {weight: 67.5, reps: 8}, {weight: 70, reps: 7}] },
-                { name: "Curl Bíceps", series: [{weight: 16, reps: 12}, {weight: 18, reps: 10}, {weight: 18, reps: 8}] }
+                { name: "Jalón al Pecho", series: [{weight:57.5,reps:12},{weight:62.5,reps:10},{weight:65,reps:8}] },
+                { name: "Remo con Barra", series: [{weight:62.5,reps:10},{weight:67.5,reps:8},{weight:67.5,reps:7}] },
+                { name: "Curl Bíceps con Barra", series: [{weight:32.5,reps:12},{weight:35,reps:10},{weight:35,reps:8}] }
             ]
         },
         {
-            id: "demo_6", date: "2025-12-15", routine: "pierna",
+            id: "demo_6", date: "2025-11-15", routine: "pierna",
             exercises: [
-                { name: "Sentadilla", series: [{weight: 85, reps: 10}, {weight: 95, reps: 8}, {weight: 100, reps: 5}] },
-                { name: "Prensa", series: [{weight: 130, reps: 12}, {weight: 140, reps: 10}, {weight: 150, reps: 8}] },
-                { name: "Femoral Tumbado", series: [{weight: 37.5, reps: 12}, {weight: 42.5, reps: 10}, {weight: 42.5, reps: 9}] }
+                { name: "Sentadilla con Barra", series: [{weight:85,reps:10},{weight:92.5,reps:8},{weight:100,reps:5}] },
+                { name: "Prensa de Piernas", series: [{weight:130,reps:12},{weight:140,reps:10},{weight:150,reps:8}] },
+                { name: "Femoral Tumbado", series: [{weight:37.5,reps:12},{weight:40,reps:10},{weight:40,reps:9}] }
             ]
         },
         {
-            id: "demo_7", date: "2025-12-18", routine: "pecho_triceps",
+            id: "demo_7", date: "2025-11-18", routine: "pecho_triceps",
             exercises: [
-                { name: "Press Banca", series: [{weight: 67.5, reps: 10}, {weight: 72.5, reps: 8}, {weight: 75, reps: 5}] },
-                { name: "Press Inclinado", series: [{weight: 55, reps: 10}, {weight: 60, reps: 8}, {weight: 60, reps: 6}] },
-                { name: "Extensión Tríceps", series: [{weight: 24, reps: 12}, {weight: 26, reps: 10}, {weight: 26, reps: 9}] }
+                { name: "Press Banca con Barra", series: [{weight:65,reps:10},{weight:70,reps:8},{weight:72.5,reps:6}] },
+                { name: "Press Inclinado con Mancuernas", series: [{weight:28,reps:10},{weight:30,reps:8},{weight:30,reps:6}] },
+                { name: "Extensión Tríceps en Polea", series: [{weight:24,reps:12},{weight:26,reps:10},{weight:26,reps:9}] }
             ]
         },
         {
-            id: "demo_8", date: "2025-12-21", routine: "hombro",
+            id: "demo_8", date: "2025-11-21", routine: "hombro",
             exercises: [
-                { name: "Press Militar", series: [{weight: 40, reps: 10}, {weight: 45, reps: 8}, {weight: 47.5, reps: 6}] },
-                { name: "Elevaciones Laterales", series: [{weight: 10, reps: 15}, {weight: 12, reps: 12}, {weight: 12, reps: 10}] },
-                { name: "Pájaro", series: [{weight: 8, reps: 15}, {weight: 10, reps: 12}, {weight: 10, reps: 10}] }
+                { name: "Press Militar con Barra", series: [{weight:40,reps:10},{weight:45,reps:8},{weight:47.5,reps:6}] },
+                { name: "Elevaciones Laterales", series: [{weight:10,reps:15},{weight:12,reps:12},{weight:12,reps:10}] },
+                { name: "Pájaro con Mancuernas", series: [{weight:8,reps:15},{weight:10,reps:12},{weight:10,reps:10}] }
+            ]
+        },
+        {
+            id: "demo_9", date: "2025-11-25", routine: "espalda_biceps",
+            exercises: [
+                { name: "Jalón al Pecho", series: [{weight:60,reps:12},{weight:65,reps:10},{weight:67.5,reps:8}] },
+                { name: "Remo con Barra", series: [{weight:65,reps:10},{weight:70,reps:8},{weight:70,reps:7}] },
+                { name: "Curl Bíceps con Barra", series: [{weight:35,reps:12},{weight:37.5,reps:10},{weight:37.5,reps:8}] }
+            ]
+        },
+        {
+            id: "demo_10", date: "2025-11-28", routine: "pierna",
+            exercises: [
+                { name: "Sentadilla con Barra", series: [{weight:90,reps:10},{weight:97.5,reps:8},{weight:102.5,reps:5}] },
+                { name: "Prensa de Piernas", series: [{weight:140,reps:12},{weight:150,reps:10},{weight:160,reps:8}] },
+                { name: "Femoral Tumbado", series: [{weight:40,reps:12},{weight:42.5,reps:10},{weight:42.5,reps:8}] }
+            ]
+        },
+        {
+            id: "demo_11", date: "2025-12-02", routine: "pecho_triceps",
+            exercises: [
+                { name: "Press Banca con Barra", series: [{weight:67.5,reps:10},{weight:72.5,reps:8},{weight:75,reps:5}] },
+                { name: "Press Inclinado con Mancuernas", series: [{weight:30,reps:10},{weight:32,reps:8},{weight:32,reps:6}] },
+                { name: "Extensión Tríceps en Polea", series: [{weight:26,reps:12},{weight:28,reps:10},{weight:28,reps:9}] }
+            ]
+        },
+        {
+            id: "demo_12", date: "2025-12-05", routine: "hombro",
+            exercises: [
+                { name: "Press Militar con Barra", series: [{weight:42.5,reps:10},{weight:47.5,reps:8},{weight:50,reps:6}] },
+                { name: "Elevaciones Laterales", series: [{weight:12,reps:15},{weight:14,reps:12},{weight:14,reps:10}] },
+                { name: "Pájaro con Mancuernas", series: [{weight:10,reps:15},{weight:12,reps:12},{weight:12,reps:10}] }
+            ]
+        },
+        {
+            id: "demo_13", date: "2025-12-09", routine: "espalda_biceps",
+            exercises: [
+                { name: "Jalón al Pecho", series: [{weight:62.5,reps:12},{weight:67.5,reps:10},{weight:70,reps:8}] },
+                { name: "Remo con Barra", series: [{weight:67.5,reps:10},{weight:72.5,reps:8},{weight:72.5,reps:6}] },
+                { name: "Curl Bíceps con Barra", series: [{weight:37.5,reps:12},{weight:40,reps:10},{weight:40,reps:8}] }
+            ]
+        },
+        {
+            id: "demo_14", date: "2025-12-12", routine: "pierna",
+            exercises: [
+                { name: "Sentadilla con Barra", series: [{weight:92.5,reps:10},{weight:100,reps:8},{weight:105,reps:5}] },
+                { name: "Prensa de Piernas", series: [{weight:150,reps:12},{weight:160,reps:10},{weight:170,reps:7}] },
+                { name: "Femoral Tumbado", series: [{weight:42.5,reps:12},{weight:45,reps:10},{weight:45,reps:8}] }
+            ]
+        },
+        {
+            id: "demo_15", date: "2025-12-16", routine: "pecho_triceps",
+            exercises: [
+                { name: "Press Banca con Barra", series: [{weight:70,reps:10},{weight:75,reps:8},{weight:77.5,reps:5}] },
+                { name: "Press Inclinado con Mancuernas", series: [{weight:32,reps:10},{weight:34,reps:8},{weight:34,reps:6}] },
+                { name: "Extensión Tríceps en Polea", series: [{weight:28,reps:12},{weight:30,reps:10},{weight:30,reps:9}] }
             ]
         }
     ],
-    draftWorkouts: {}
+        draftWorkouts: {}
 };
 
 // ==================== PANTALLA DE LOGIN ====================
