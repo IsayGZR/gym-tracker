@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Gym Tracker Pro - Entrenamiento Inteligente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Animaciones suaves */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Chat flotante */
+        #aiChatContainer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        #aiChatBox {
+            width: 400px;
+            max-width: calc(100vw - 40px);
+            height: 600px;
+            max-height: calc(100vh - 100px);
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        #aiChatBox:not(.hidden) {
+            display: flex;
+        }
+        
+        /* FORZAR HIDDEN */
+        #aiChatBox.hidden {
+            display: none !important;
+        }
+
+        #chatMessages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        #chatMessages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chatMessages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        #chatMessages::-webkit-scrollbar-thumb {
+            background: #6366f1;
+            border-radius: 10px;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .message-content {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            line-height: 1.5;
+        }
+
+        .user-message .message-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message .message-content {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        #aiChatButton {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+        }
+
+        #aiChatButton:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+
+        #voiceButton {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(245, 87, 108, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        #voiceButton:hover {
+            transform: scale(1.1);
+        }
+
+        #voiceButton.listening {
+            animation: pulse 1s infinite;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        /* Tarjetas con glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Efectos de gradiente modernos */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Badge de IA */
+        .ai-badge {
+            position: relative;
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        /* Gráficos mejorados */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Loading spinner */
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #667eea;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Botones mejorados */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Insights card */
+        .insight-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-left: 4px solid #667eea;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        /* Stats display */
+        .stat-box {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            #aiChatBox {
+                width: calc(100vw - 40px);
+                height: calc(100vh - 100px);
+            }
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        #loginScreen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 15px;
+            outline: none;
+            transition: border 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .login-input::placeholder { color: rgba(255,255,255,0.4); }
+        .login-input:focus { border-color: #667eea; }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);
+        }
+
+        .btn-login:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-demo {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.85);
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .btn-demo:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .active-tab {
+            background: rgba(255,255,255,0.15) !important;
+            color: white !important;
+        }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .success-msg {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #86efac;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        /* Demo banner */
+        #demoBanner {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            text-align: center;
+            padding: 10px 20px;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        /* ===== TOUR GUIADO ===== */
+        #tourOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9998;
+            backdrop-filter: blur(3px);
+        }
+
+        .tour-bubble {
+            position: fixed;
+            z-index: 9999;
+            background: white;
+            border-radius: 20px;
+            padding: 24px 28px;
+            max-width: 320px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .tour-bubble::before {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: white;
+            transform: rotate(45deg);
+        }
+
+        .tour-bubble.arrow-top::before { top: -8px; left: 50%; margin-left: -8px; }
+        .tour-bubble.arrow-bottom::before { bottom: -8px; left: 50%; margin-left: -8px; }
+        .tour-bubble.arrow-left::before { left: -8px; top: 30px; }
+        .tour-bubble.arrow-right::before { right: -8px; top: 30px; }
+        .tour-bubble.arrow-none::before { display: none; }
+
+        .tour-emoji { font-size: 40px; margin-bottom: 10px; }
+        .tour-title { font-size: 18px; font-weight: 700; color: #1e1b4b; margin-bottom: 6px; }
+        .tour-desc { font-size: 14px; color: #6b7280; line-height: 1.5; margin-bottom: 16px; }
+        .tour-progress { display: flex; gap: 6px; margin-bottom: 16px; }
+        .tour-dot { width: 8px; height: 8px; border-radius: 50%; background: #e5e7eb; transition: background 0.2s; }
+        .tour-dot.active { background: #667eea; }
+        .tour-actions { display: flex; gap: 8px; }
+        .tour-btn-skip { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #e5e7eb; background: white; color: #9ca3af; font-size: 13px; cursor: pointer; font-family: 'Outfit', sans-serif; }
+        .tour-btn-next { flex: 2; padding: 10px; border-radius: 10px; border: none; background: linear-gradient(135deg, #667eea, #764ba2); color: white; font-weight: 700; font-size: 14px; cursor: pointer; font-family: 'Outfit', sans-serif; }
+
+        /* ===== ÍCONOS DE AYUDA ===== */
+        .help-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            color: #a5b4fc;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-left: 6px;
+            vertical-align: middle;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .help-icon:hover { background: rgba(102, 126, 234, 0.6); color: white; }
+
+        .help-tooltip {
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1b4b;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 400;
+            white-space: nowrap;
+            max-width: 250px;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.4;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            width: 220px;
+        }
+
+        .help-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: #1e1b4b;
+        }
+
+        .help-icon:hover .help-tooltip { opacity: 1; }
+
+    </style>
+</head>
+<body>
+
+    <!-- ==================== PANTALLA DE LOGIN ==================== -->
+    <div id="loginScreen" class="hidden" style="min-height:100vh; padding:40px 20px;">
+        <!-- Hero banner -->
+        <div style="text-align:center; max-width:600px; margin:0 auto 40px;">
+            <h1 style="font-size:48px; font-weight:800; color:white; margin-bottom:12px; line-height:1.1;">Gym Tracker</h1>
+            <p style="color:rgba(255,255,255,0.65); font-size:18px; margin-bottom:24px; line-height:1.5;">App de seguimiento de entrenamiento con inteligencia artificial, predicción de rendimiento y análisis nutricional</p>
+            <!-- CTA demo destacado -->
+            <div style="background:linear-gradient(135deg,rgba(102,126,234,0.15),rgba(118,75,162,0.15)); border:1px solid rgba(102,126,234,0.3); border-radius:16px; padding:20px; margin-top:10px;">
+                <p style="color:rgba(255,255,255,0.8); font-size:15px; margin-bottom:14px;">Explora todas las funciones sin necesidad de cuenta, </p>
+                <button onclick="enterDemoMode()" style="background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none; padding:14px 32px; border-radius:12px; font-size:16px; font-weight:700; cursor:pointer; font-family:'Outfit',sans-serif; box-shadow:0 8px 25px rgba(102,126,234,0.4); width:100%;">
+                    🎮 Explorar Versión Demo
+                </button>
+            </div>
+        </div>
+
+        <div style="max-width:440px; margin:0 auto;">
+        <div class="login-card">
+            <!-- Logo -->
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-3">🔐</div>
+                <h1 class="text-3xl font-bold text-white">Acceso Personal</h1>
+                <p class="text-white/50 mt-1 text-sm">Se está trabajando para crear una cuenta privada; de momento, con la versión demo se puede acceder a todas las funciones.</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex gap-1 mb-6 bg-white/5 p-1 rounded-xl">
+                <button class="tab-btn active-tab" id="tabBtn_login" onclick="showTab('login')">Iniciar Sesión</button>
+                <button class="tab-btn" id="tabBtn_register" onclick="showTab('register')">Registrarse</button>
+                <button class="tab-btn" id="tabBtn_confirm" onclick="showTab('confirm')">Verificar</button>
+            </div>
+
+            <!-- Tab Login -->
+            <div id="tab_login">
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-white/70 text-sm mb-1.5 font-medium">Correo electrónico</label>
+                        <input type="email" id="loginEmail" class="login-input" placeholder="tu@correo.com"
+                               onkeypress="if(event.key==='Enter') document.getElementById('loginPassword').focus()">
+                    </div>
+                    <div>
+                        <label class="block text-white/70 text-sm mb-1.5 font-medium">Contraseña</label>
+                        <input type="password" id="loginPassword" class="login-input" placeholder="••••••••"
+                               onkeypress="if(event.key==='Enter') loginWithCognito(document.getElementById('loginEmail').value, this.value)">
+                    </div>
+                </div>
+                <div id="loginError" class="error-msg hidden mb-4"></div>
+                <button id="loginBtn" class="btn-login mb-3"
+                        onclick="loginWithCognito(document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)">
+                    🔐 Iniciar Sesión
+                </button>
+            </div>
+
+            <!-- Tab Register -->
+            <div id="tab_register" class="hidden">
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-white/70 text-sm mb-1.5 font-medium">Correo electrónico</label>
+                        <input type="email" id="registerEmail" class="login-input" placeholder="tu@correo.com">
+                    </div>
+                    <div>
+                        <label class="block text-white/70 text-sm mb-1.5 font-medium">Contraseña</label>
+                        <input type="password" id="registerPassword" class="login-input" placeholder="Mínimo 8 caracteres, mayúscula y número">
+                    </div>
+                    <div>
+                        <label class="block text-white/70 text-sm mb-1.5 font-medium">Confirmar contraseña</label>
+                        <input type="password" id="registerConfirm" class="login-input" placeholder="Repite tu contraseña">
+                    </div>
+                </div>
+                <div id="registerError" class="error-msg hidden mb-4"></div>
+                <div id="registerSuccess" class="success-msg hidden mb-4"></div>
+                <button id="registerBtn" class="btn-login mb-3"
+                        onclick="handleRegister()">
+                    ✨ Crear Cuenta
+                </button>
+                <p class="text-white/40 text-xs text-center">Recibirás un código de verificación en tu correo</p>
+            </div>
+
+            <!-- Tab Confirm -->
+            <div id="tab_confirm" class="hidden">
+                <p class="text-white/60 text-sm mb-4">Ingresa el código de 6 dígitos que recibiste en tu correo.</p>
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-white/70 text-sm mb-1.5 font-medium">Correo electrónico</label>
+                        <input type="email" id="confirmEmail" class="login-input" placeholder="tu@correo.com">
+                    </div>
+                    <div>
+                        <label class="block text-white/70 text-sm mb-1.5 font-medium">Código de verificación</label>
+                        <input type="text" id="confirmCode" class="login-input" placeholder="123456" maxlength="6"
+                               onkeypress="if(event.key==='Enter') confirmEmail(document.getElementById('confirmEmail').value, this.value)">
+                    </div>
+                </div>
+                <div id="confirmError" class="error-msg hidden mb-4"></div>
+                <div id="confirmSuccess" class="success-msg hidden mb-4"></div>
+                <button id="confirmBtn" class="btn-login mb-3"
+                        onclick="confirmEmail(document.getElementById('confirmEmail').value, document.getElementById('confirmCode').value)">
+                    ✅ Verificar Cuenta
+                </button>
+            </div>
+
+            <!-- Separador -->
+            <div class="flex items-center gap-3 my-5">
+                <div class="flex-1 h-px bg-white/15"></div>
+                <span class="text-white/35 text-sm">o</span>
+                <div class="flex-1 h-px bg-white/15"></div>
+            </div>
+
+            <!-- Botón Demo -->
+            <button class="btn-demo" onclick="enterDemoMode()">
+                🎮 Explorar Demo <span class="text-white/50 font-normal text-sm ml-1">· Sin cuenta necesaria</span>
+            </button>
+
+        </div>
+        </div>
+    </div>
+
+    <!-- ==================== PANTALLA DE BIENVENIDA DEMO ==================== -->
+    <div id="demoWelcomeScreen" class="hidden" style="min-height:100vh; align-items:center; justify-content:center; padding:20px;">
+        <div style="text-align:center; max-width:500px;">
+            <h1 style="font-size:36px; font-weight:800; color:white; margin-bottom:10px;">Gym Tracker</h1>
+            <p style="color:rgba(255,255,255,0.6); font-size:18px; margin-bottom:8px;">Modo Demo Interactivo</p>
+            <p style="color:rgba(255,255,255,0.4); font-size:14px; margin-bottom:40px;">Explora todas las funciones con datos de ejemplo · Nada se guarda</p>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:40px; text-align:left;">
+                <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:16px; padding:16px;">
+                    <div style="font-size:28px; margin-bottom:6px;">🏋️</div>
+                    <div style="color:white; font-weight:600; font-size:14px;">Seguimiento</div>
+                    <div style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">Registra y visualiza tus entrenamientos</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:16px; padding:16px;">
+                    <div style="font-size:28px; margin-bottom:6px;">🤖</div>
+                    <div style="color:white; font-weight:600; font-size:14px;">IA Integrada</div>
+                    <div style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">Análisis y recomendaciones personalizadas</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:16px; padding:16px;">
+                    <div style="font-size:28px; margin-bottom:6px;">🔮</div>
+                    <div style="color:white; font-weight:600; font-size:14px;">Predicciones</div>
+                    <div style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">Series de tiempo para predecir tu progreso</div>
+                </div>
+                <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:16px; padding:16px;">
+                    <div style="font-size:28px; margin-bottom:6px;">🍎</div>
+                    <div style="color:white; font-weight:600; font-size:14px;">Nutrición</div>
+                    <div style="color:rgba(255,255,255,0.5); font-size:12px; margin-top:4px;">Contador de calorías con IA y cámara</div>
+                </div>
+            </div>
+
+            <button onclick="startDemoApp()" style="width:100%; padding:18px; border-radius:14px; background:linear-gradient(135deg,#667eea,#764ba2); color:white; font-weight:700; font-size:18px; border:none; cursor:pointer; box-shadow:0 10px 30px rgba(102,126,234,0.4); font-family:'Outfit',sans-serif; margin-bottom:12px;">
+                🚀 Comenzar Tour Guiado
+            </button>
+            <button onclick="skipTourAndEnter()" style="width:100%; padding:14px; border-radius:14px; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.6); font-weight:600; font-size:15px; border:1px solid rgba(255,255,255,0.15); cursor:pointer; font-family:'Outfit',sans-serif;">
+                Explorar sin guía →
+            </button>
+            <button onclick="logout()" style="display:block; margin:16px auto 0; color:rgba(255,255,255,0.3); font-size:13px; background:none; border:none; cursor:pointer; font-family:'Outfit',sans-serif;">
+                ← Volver al login
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== OVERLAY DEL TOUR ==================== -->
+    <div id="tourOverlay" class="hidden"></div>
+    <div id="tourBubble" class="tour-bubble hidden"></div>
+
+    <!-- ==================== APLICACIÓN PRINCIPAL ==================== -->
+    <div id="mainApp" class="hidden">
+
+    <!-- Banner modo demo -->
+    <div id="demoBanner" class="hidden">
+        🎮 Estás en <strong>Modo Demo</strong> — Los datos son de ejemplo y no se guardan.
+        <button onclick="logout()" class="ml-3 underline font-normal opacity-80 hover:opacity-100">← Volver al login</button>
+    </div>
+
+    <div class="min-h-screen p-5">
+        <div class="max-w-7xl mx-auto bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl p-8 border border-white/20">
+            
+            <!-- MENÚ PRINCIPAL -->
+            <div id="mainMenu" class="fade-in">
+                <div class="text-center mb-12">
+                    <div class="flex justify-end mb-2">
+                        <button onclick="logout()" class="text-white/40 hover:text-white/70 text-sm transition flex items-center gap-1.5">
+                            <span id="userEmailDisplay"></span>
+                            <span class="bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 border border-white/10">Cerrar sesión →</span>
+                        </button>
+                    </div>
+                    <h1 class="text-5xl font-bold text-white mb-4">
+                        💪 AI Gym Tracker Pro
+                        <span class="ai-badge">✨ AI-POWERED</span>
+                    </h1>
+                    <p class="text-white/70 text-xl font-light">Tu asistente inteligente de entrenamiento</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-8" id="mainMenuGrid">
+                    <button onclick="showView('selectRoutine')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_workout">
+                        <span class="text-4xl mb-3">🏋️</span>
+                        <span>Nuevo Entrenamiento</span>
+                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Selecciona una rutina y registra tus series, pesos y repeticiones de cada ejercicio.">?<span class="help-tooltip">Selecciona una rutina y registra tus series, pesos y repeticiones de cada ejercicio.</span></span>
+                    </button>
+                    <button onclick="showView('addExercises')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_addEx">
+                        <span class="text-4xl mb-3">➕</span>
+                        <span>Agregar Ejercicios</span>
+                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Crea nuevos ejercicios y agrégalos a tus rutinas existentes o crea una rutina nueva.">?<span class="help-tooltip">Crea nuevos ejercicios y agrégalos a tus rutinas existentes o crea una rutina nueva.</span></span>
+                    </button>
+                    <button onclick="showManagement()" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_manage">
+                        <span class="text-4xl mb-3">⚙️</span>
+                        <span>Gestionar Rutinas</span>
+                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Edita, elimina o reorganiza tus rutinas y los ejercicios dentro de cada una.">?<span class="help-tooltip">Edita, elimina o reorganiza tus rutinas y los ejercicios dentro de cada una.</span></span>
+                    </button>
+                    <button onclick="showView('history')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_history">
+                        <span class="text-4xl mb-3">📊</span>
+                        <span>Historial</span>
+                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Consulta todos tus entrenamientos anteriores. Puedes editarlos, eliminarlos o exportarlos en PDF.">?<span class="help-tooltip">Consulta todos tus entrenamientos anteriores. Puedes editarlos, eliminarlos o exportarlos en PDF.</span></span>
+                    </button>
+                    <button onclick="showView('analytics')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_analytics">
+                        <span class="text-4xl mb-3">📈</span>
+                        <span>Análisis IA</span>
+                        <span class="ai-badge">NUEVO</span>
+                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="La IA analiza tu historial y genera gráficas de progreso, volumen total y puntos de mejora.">?<span class="help-tooltip">La IA analiza tu historial y genera gráficas de progreso, volumen total y puntos de mejora.</span></span>
+                    </button>
+                    <button onclick="showView('aiRecommendations')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_recs">
+                        <span class="text-4xl mb-3">🤖</span>
+                        <span>Recomendaciones</span>
+                        <span class="ai-badge">NUEVO</span>
+                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="El asistente IA genera recomendaciones personalizadas basadas en tus últimas sesiones y metas.">?<span class="help-tooltip">El asistente IA genera recomendaciones personalizadas basadas en tus últimas sesiones y metas.</span></span>
+                    </button>
+                    <button onclick="showView('predictions')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_pred">
+                        <span class="text-4xl mb-3">🔮</span>
+                        <span>Predicción</span>
+                        <span class="ai-badge">NUEVO</span>
+                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Usa regresión polinomial y series de tiempo para predecir tu 1RM y progreso en las próximas sesiones.">?<span class="help-tooltip">Usa regresión polinomial y series de tiempo para predecir tu 1RM y progreso en las próximas sesiones.</span></span>
+                    </button>
+                    <button onclick="showView('calories')" class="glass-card text-white p-8 text-xl font-semibold h-40 flex flex-col items-center justify-center relative" id="btn_cal">
+                        <span class="text-4xl mb-3">🍎</span>
+                        <span>Contador Calorías</span>
+                        <span class="ai-badge">NUEVO</span>
+                        <span class="help-icon demo-only hidden" onclick="event.stopPropagation()" data-tip="Escribe un alimento o toma una foto con la cámara y la IA calcula calorías, proteínas, carbos y grasas.">?<span class="help-tooltip">Escribe un alimento o toma una foto con la cámara y la IA calcula calorías, proteínas, carbos y grasas.</span></span>
+                    </button>
+                </div>
+
+                <!-- Gestión de API Key -->
+                <div class="max-w-4xl mx-auto mb-6">
+                    <div class="glass-card p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">🔑</span>
+                            <div>
+                                <p class="text-white font-semibold" id="apiKeyStatus">Estado de API Key</p>
+                                <p class="text-white/70 text-sm">Necesaria para funciones de IA</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="showApiKeyManager()" class="bg-white/20 text-white px-4 py-2 rounded-lg hover:bg-white/30 transition font-semibold text-sm">
+                                ⚙️ Configurar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats rápidas -->
+                <div id="quickStats" class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                    <!-- Se llenarán dinámicamente -->
+                </div>
+            </div>
+
+            <!-- SELECCIONAR RUTINA -->
+            <div id="selectRoutine" class="hidden fade-in">
+                <h1 class="text-3xl font-bold text-white mb-6">Selecciona tu rutina</h1>
+                <div id="routinesList" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <!-- Se llenarán dinámicamente -->
+                </div>
+                <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/20 border border-white/20">
+                    🏠 Volver
+                </button>
+            </div>
+
+            <!-- VISTA ENTRENAMIENTO -->
+            <div id="workout" class="hidden fade-in">
+                <div class="glass-card text-white p-6 rounded-xl mb-6">
+                    <h2 id="workoutTitle" class="text-3xl font-bold"></h2>
+                    <p id="workoutDate" class="text-lg opacity-80"></p>
+                    <div id="aiSuggestions" class="mt-4">
+                        <!-- Sugerencias de IA -->
+                    </div>
+                </div>
+
+                <div id="workoutExercises">
+                    <!-- Se llenarán dinámicamente -->
+                </div>
+
+                <div class="flex gap-4 flex-wrap mt-6">
+                    <button onclick="saveDraft()" class="btn-primary">
+                        💾 Guardar Borrador
+                    </button>
+                    <button onclick="finishWorkout()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-lg hover:shadow-xl font-bold text-lg transition">
+                        ✅ Finalizar Entrenamiento
+                    </button>
+                    <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-8 py-4 rounded-lg hover:bg-white/20 border border-white/20 font-bold text-lg">
+                        🏠 Volver
+                    </button>
+                </div>
+            </div>
+
+            <!-- ANÁLISIS CON IA -->
+            <div id="analytics" class="hidden fade-in">
+                <h1 class="text-4xl font-bold text-white mb-8 text-center">
+                    📈 Análisis Inteligente
+                    <span class="ai-badge">AI-POWERED</span>
+                </h1>
+                
+                <div id="analyticsContent" class="space-y-6">
+                    <!-- Gráficos y análisis -->
+                    <div class="chart-container">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+
+                    <div id="aiInsights" class="space-y-4">
+                        <!-- Insights generados por IA -->
+                    </div>
+                </div>
+
+                <button onclick="generateAIAnalysis()" class="btn-primary mt-6">
+                    🤖 Generar Análisis con IA
+                </button>
+                
+                <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/20 border border-white/20 mt-4">
+                    🏠 Volver
+                </button>
+            </div>
+
+            <!-- RECOMENDACIONES IA -->
+            <div id="aiRecommendations" class="hidden fade-in">
+                <h1 class="text-4xl font-bold text-white mb-8 text-center">
+                    🤖 Recomendaciones Inteligentes
+                </h1>
+                
+                <div id="recommendationsContent" class="space-y-4">
+                    <!-- Recomendaciones -->
+                </div>
+
+                <button onclick="generateRecommendations()" class="btn-primary mt-6">
+                    ✨ Generar Recomendaciones
+                </button>
+                
+                <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/20 border border-white/20 mt-4">
+                    🏠 Volver
+                </button>
+            </div>
+
+            <!-- HISTORIAL -->
+            <div id="history" class="hidden fade-in">
+                <h1 class="text-3xl font-bold text-white mb-8 text-center">📊 Historial de Entrenamientos</h1>
+                <div id="historyContainer">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+                
+                <div class="flex gap-4 mt-6 flex-wrap">
+                    <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/20 border border-white/20">
+                        🏠 Volver al Menú
+                    </button>
+                    <button onclick="downloadHistoryPDF()" class="btn-primary">
+                        📄 Descargar PDF
+                    </button>
+                    <button onclick="clearAllHistory()" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg hover:shadow-xl font-semibold">
+                        🗑️ Borrar Historial
+                    </button>
+                </div>
+            </div>
+
+            <!-- PREDICCIONES IA -->
+            <div id="predictions" class="hidden fade-in">
+                <h1 class="text-4xl font-bold text-white mb-2 text-center">
+                    🔮 Predicción de Rendimiento
+                </h1>
+                <p class="text-white/60 text-center mb-8">Basado en tu historial real usando regresión polinomial</p>
+
+                <!-- Selector de ejercicio -->
+                <div class="glass-card p-6 mb-6">
+                    <label class="block text-white font-semibold mb-3">Selecciona un ejercicio para predecir:</label>
+                    <div class="flex gap-3 flex-wrap">
+                        <select id="predictionExerciseSelect" 
+                            class="flex-1 p-3 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-purple-400">
+                            <option value="">-- Elige un ejercicio --</option>
+                        </select>
+                        <select id="predictionSessionsAhead"
+                            class="p-3 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-purple-400">
+                            <option value="3">+3 sesiones</option>
+                            <option value="4" selected>+4 sesiones</option>
+                            <option value="5">+5 sesiones</option>
+                            <option value="8">+8 sesiones</option>
+                        </select>
+                        <button onclick="runPrediction()" class="btn-primary">
+                            🔮 Predecir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resultado -->
+                <div id="predictionResult" class="space-y-4"></div>
+
+                <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/20 border border-white/20 mt-6">
+                    🏠 Volver
+                </button>
+            </div>
+
+            <!-- CONTADOR DE CALORÍAS -->
+            <div id="calories" class="hidden fade-in">
+                <h1 class="text-4xl font-bold text-white mb-2 text-center">🍎 Contador de Calorías</h1>
+                <p class="text-white/60 text-center mb-8">Escribe un alimento y obtén su información nutricional</p>
+
+                <!-- Tabs texto / cámara -->
+                <div class="flex gap-3 mb-4">
+                    <button onclick="setCaloriesMode('text')" id="tabText" class="btn-primary flex-1">
+                        ✏️ Escribir
+                    </button>
+                    <button onclick="setCaloriesMode('camera')" id="tabCamera" class="flex-1 bg-white/10 text-white px-6 py-3 rounded-lg hover:bg-white/20 border border-white/20 font-semibold">
+                        📷 Cámara
+                    </button>
+                </div>
+
+                <!-- Modo texto -->
+                <div id="modeText" class="glass-card p-6 mb-6">
+                    <label class="block text-white font-semibold mb-3">¿Qué comiste?</label>
+                    <div class="flex gap-3">
+                        <input 
+                            type="text" 
+                            id="foodInput" 
+                            placeholder="Ej: manzana, 100g arroz, 2 huevos..." 
+                            class="flex-1 p-3 rounded-lg bg-white/10 text-white border border-white/20 focus:outline-none focus:border-purple-400 placeholder-white/40"
+                            onkeypress="if(event.key === 'Enter') searchFood()"
+                        >
+                        <button onclick="searchFood()" class="btn-primary">
+                            🔍 Buscar
+                        </button>
+                    </div>
+                    <div class="flex gap-2 flex-wrap mt-4">
+                        <span class="text-white/50 text-sm">Prueba:</span>
+                        <button onclick="quickSearch('manzana')" class="text-sm bg-white/10 text-white px-3 py-1 rounded-full hover:bg-white/20 border border-white/20">🍎 manzana</button>
+                        <button onclick="quickSearch('arroz blanco')" class="text-sm bg-white/10 text-white px-3 py-1 rounded-full hover:bg-white/20 border border-white/20">🍚 arroz</button>
+                        <button onclick="quickSearch('pollo')" class="text-sm bg-white/10 text-white px-3 py-1 rounded-full hover:bg-white/20 border border-white/20">🍗 pollo</button>
+                        <button onclick="quickSearch('platano')" class="text-sm bg-white/10 text-white px-3 py-1 rounded-full hover:bg-white/20 border border-white/20">🍌 plátano</button>
+                        <button onclick="quickSearch('huevo')" class="text-sm bg-white/10 text-white px-3 py-1 rounded-full hover:bg-white/20 border border-white/20">🥚 huevo</button>
+                    </div>
+                </div>
+
+                <!-- Modo cámara -->
+                <div id="modeCamera" class="glass-card p-6 mb-6 hidden">
+                    <label class="block text-white font-semibold mb-3">Toma una foto del alimento</label>
+                    
+                    <!-- Preview de cámara -->
+                    <div class="relative mb-4">
+                        <video id="cameraStream" class="w-full rounded-xl hidden" autoplay playsinline></video>
+                        <canvas id="cameraCanvas" class="w-full rounded-xl hidden"></canvas>
+                        <img id="capturedPhoto" class="w-full rounded-xl hidden" alt="Foto capturada">
+                        
+                        <div id="cameraPlaceholder" class="w-full h-48 bg-white/5 rounded-xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center">
+                            <span class="text-5xl mb-3">📷</span>
+                            <p class="text-white/60">Activa la cámara para tomar una foto</p>
+                        </div>
+                    </div>
+
+                    <!-- Botones cámara -->
+                    <div class="flex gap-3 flex-wrap">
+                        <button onclick="startCamera()" id="btnStartCamera" class="btn-primary">
+                            📷 Activar Cámara
+                        </button>
+                        <button onclick="capturePhoto()" id="btnCapture" class="hidden bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 font-semibold">
+                            ✅ Tomar Foto
+                        </button>
+                        <button onclick="retakePhoto()" id="btnRetake" class="hidden bg-white/10 text-white px-6 py-3 rounded-lg hover:bg-white/20 border border-white/20 font-semibold">
+                            🔄 Repetir
+                        </button>
+                        <button onclick="analyzePhoto()" id="btnAnalyze" class="hidden btn-primary">
+                            🔍 Analizar con IA
+                        </button>
+                    </div>
+
+                    <!-- Alternativa: subir imagen -->
+                    <div class="mt-4 pt-4 border-t border-white/10">
+                        <label class="text-white/50 text-sm mb-2 block">O sube una imagen:</label>
+                        <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)"
+                            class="text-white/70 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-white/20 file:text-white hover:file:bg-white/30 cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Resultado -->
+                <div id="caloriesResult" class="space-y-4"></div>
+
+                <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/20 border border-white/20 mt-6">
+                    🏠 Volver
+                </button>
+            </div>
+
+            <!-- EDITAR HISTORIAL -->
+            <div id="editHistory" class="hidden fade-in">
+                <!-- Se llenará dinámicamente -->
+            </div>
+
+            <!-- EDITAR ENTRENAMIENTO -->
+            <div id="editWorkout" class="hidden fade-in">
+                <!-- Se llenará dinámicamente -->
+            </div>
+
+            <!-- AGREGAR EJERCICIOS -->
+            <div id="addExercises" class="hidden fade-in">
+                <div class="text-center p-12">
+                    <h2 class="text-2xl font-bold text-white mb-4">Funcionalidad en desarrollo</h2>
+                    <p class="text-white/70 mb-6">Esta sección estará disponible próximamente</p>
+                    <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-6 py-3 rounded-lg hover:bg-white/20 border border-white/20">
+                        🏠 Volver al Menú
+                    </button>
+                </div>
+            </div>
+
+            <!-- GESTIÓN -->
+            <div id="management" class="hidden fade-in">
+                <div class="text-center p-12">
+                    <h2 class="text-2xl font-bold text-white mb-4">Funcionalidad en desarrollo</h2>
+                    <p class="text-white/70 mb-6">Esta sección estará disponible próximamente</p>
+                    <button onclick="showView('mainMenu')" class="bg-white/10 text-white px-6 py-3 rounded-lg hover:bg-white/20 border border-white/20">
+                        🏠 Volver al Menú
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL GESTIÓN DE API KEY -->
+    <div id="apiKeyModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fadeIn">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">🔑 Configurar API Key</h2>
+                <button onclick="closeApiKeyManager()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    ×
+                </button>
+            </div>
+
+            <div id="apiKeyContent">
+                <!-- Estado actual -->
+                <div class="mb-6 p-4 rounded-lg" id="currentKeyStatus">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+
+                <!-- Formulario -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            API Key de Google Gemini
+                        </label>
+                        <input 
+                            type="password" 
+                            id="apiKeyInput" 
+                            placeholder="AIzaSy..." 
+                            class="w-full p-3 border-2 border-gray-300 rounded-lg focus:border-purple-600 focus:outline-none"
+                        >
+                        <p class="text-xs text-gray-500 mt-2">
+                            Obtén tu key GRATIS en: <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-purple-600 hover:underline">aistudio.google.com/app/apikey</a>
+                        </p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button 
+                            onclick="testApiKey()" 
+                            class="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-semibold transition"
+                        >
+                            🧪 Probar Key
+                        </button>
+                        <button 
+                            onclick="saveApiKey()" 
+                            class="flex-1 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 font-semibold transition"
+                        >
+                            💾 Guardar
+                        </button>
+                    </div>
+
+                    <button 
+                        onclick="deleteApiKey()" 
+                        class="w-full bg-red-500 text-white px-4 py-3 rounded-lg hover:bg-red-600 font-semibold transition"
+                    >
+                        🗑️ Eliminar API Key Actual
+                    </button>
+                </div>
+
+                <!-- Mensajes de estado -->
+                <div id="apiKeyMessage" class="mt-4 hidden p-3 rounded-lg text-sm">
+                    <!-- Mensajes dinámicos -->
+                </div>
+
+                <!-- Instrucciones -->
+                <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-semibold text-gray-800 mb-2">📝 Instrucciones:</h3>
+                    <ol class="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+                        <li>Obtén tu API Key GRATIS en aistudio.google.com/app/apikey</li>
+                        <li>Pega la key en el campo de arriba</li>
+                        <li>Click en "Probar Key" para verificar</li>
+                        <li>Si funciona, click en "Guardar"</li>
+                    </ol>
+                    <p class="text-xs text-green-600 mt-3 font-semibold">
+                        ✨ Gemini es 100% GRATIS con límites muy generosos
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAT FLOTANTE DE IA -->
+    <div id="aiChatContainer">
+        <div id="aiChatBox" class="hidden" style="display: none;">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 flex justify-between items-center">
+                <div>
+                    <h3 class="font-bold text-lg">🤖 Asistente IA</h3>
+                    <p class="text-sm opacity-80">Pregúntame lo que quieras</p>
+                </div>
+                <button onclick="toggleChat()" class="text-white hover:bg-white/20 rounded-lg p-2 transition">
+                    ✕
+                </button>
+            </div>
+            
+            <div id="chatMessages" class="flex-1">
+                <div class="message ai-message">
+                    <div class="message-content">
+                        👋 ¡Hola! Soy tu asistente de entrenamiento con IA. Puedo ayudarte a:
+                        <ul class="mt-2 space-y-1">
+                            <li>📊 Analizar tu progreso</li>
+                            <li>💡 Crear rutinas personalizadas</li>
+                            <li>📈 Darte recomendaciones</li>
+                            <li>❓ Responder dudas sobre entrenamiento</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-4 border-t border-gray-200">
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" placeholder="Escribe tu pregunta..." 
+                           class="flex-1 p-3 border-2 border-gray-200 rounded-lg focus:border-indigo-600 focus:outline-none"
+                           onkeypress="if(event.key === 'Enter') sendMessage()">
+                    <button onclick="sendMessage()" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition font-semibold">
+                        Enviar
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <button id="aiChatButton" onclick="toggleChat()">
+            🤖
+        </button>
+    </div>
+
+    <!-- BOTÓN DE VOZ -->
+    <button id="voiceButton" onclick="toggleVoiceRecognition()" title="Control por voz">
+        🎤
+    </button>
+
+    <script src="app.js?v=3"></script>
+    <script src="auth.js"></script>
+    <script>
+    // ==================== GOOGLE GEMINI INTEGRATION ====================
+    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+    
+    // Actualizar storage key para Gemini
+    apiKey = localStorage.getItem('geminiApiKey') || 'AIzaSyAo-6pjDjpMUDnfjTKTgDaZrnrn7BiqgH0';
+    
+    if (!localStorage.getItem('geminiApiKey')) {
+        localStorage.setItem('geminiApiKey', apiKey);
+        console.log('✅ API Key de Gemini pre-configurada');
+    }
+    
+    console.log('✅ Google Gemini Integration cargada - Modelo: gemini-2.5-flash');
+    
+    // ==================== FUNCIONES DEL CHAT ====================
+    let isChatOpen = false;
+    
+    function toggleChat() {
+        isChatOpen = !isChatOpen;
+        const chatBox = document.getElementById('aiChatBox');
+        const chatButton = document.getElementById('aiChatButton');
+        
+        if (isChatOpen) {
+            chatBox.classList.remove('hidden');
+            chatBox.style.display = 'flex';
+            chatButton.textContent = '✕';
+        } else {
+            chatBox.classList.add('hidden');
+            chatBox.style.display = 'none';
+            chatButton.textContent = '🤖';
+        }
+    }
+    
+    // Asegurar que el chat esté cerrado al cargar
+    window.addEventListener('DOMContentLoaded', function() {
+        const chatBox = document.getElementById('aiChatBox');
+        const chatButton = document.getElementById('aiChatButton');
+        
+        if (chatBox && chatButton) {
+            chatBox.classList.add('hidden');
+            chatBox.style.display = 'none';
+            chatButton.textContent = '🤖';
+            isChatOpen = false;
+        }
+        
+        // Agregar listener para Enter en el input
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+    });
+    
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        addChatMessage(message, 'user');
+        input.value = '';
+        
+        const loadingId = addChatMessage('Pensando...', 'ai', true);
+        
+        const context = `Eres un asistente experto en entrenamiento físico y nutrición. Responde en español de forma clara y concisa.
+
+Pregunta: ${message}`;
+        
+        const response = await callOpenAI(context);
+        
+        removeChatMessage(loadingId);
+        
+        if (response) {
+            addChatMessage(response, 'ai');
+        } else {
+            addChatMessage('Lo siento, no pude procesar tu solicitud.', 'ai');
+        }
+    }
+    
+    function addChatMessage(text, type, isLoading = false) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        const messageId = Date.now();
+        
+        messageDiv.className = `message ${type}-message`;
+        messageDiv.id = `msg-${messageId}`;
+        
+        if (isLoading) {
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="loading-spinner"></div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                <div class="message-content">${text}</div>
+            `;
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        return messageId;
+    }
+    
+    function removeChatMessage(messageId) {
+        const message = document.getElementById(`msg-${messageId}`);
+        if (message) message.remove();
+    }
+    
+    // ==================== FUNCIONES DEL MODAL ====================
+    function showApiKeyManager() {
+        const modal = document.getElementById('apiKeyModal');
+        const currentKeyStatus = document.getElementById('currentKeyStatus');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        
+        if (apiKey && apiKey.length > 0) {
+            const maskedKey = apiKey.substring(0, 10) + '...' + apiKey.substring(apiKey.length - 4);
+            currentKeyStatus.innerHTML = `
+                <div class="bg-green-50 border border-green-200 p-4 rounded">
+                    <p class="text-green-800 font-semibold mb-1">✅ API Key Configurada</p>
+                    <p class="text-green-600 text-sm font-mono">${maskedKey}</p>
+                </div>
+            `;
+        } else {
+            currentKeyStatus.innerHTML = `
+                <div class="bg-yellow-50 border border-yellow-200 p-4 rounded">
+                    <p class="text-yellow-800 font-semibold">⚠️ No hay API Key configurada</p>
+                    <p class="text-yellow-600 text-sm">Las funciones de IA no estarán disponibles</p>
+                </div>
+            `;
+        }
+        
+        apiKeyInput.value = '';
+        hideApiKeyMessage();
+        modal.classList.remove('hidden');
+    }
+    
+    function closeApiKeyManager() {
+        const modal = document.getElementById('apiKeyModal');
+        modal.classList.add('hidden');
+        updateApiKeyStatus();
+    }
+    
+    function showApiKeyMessage(message, type = 'info') {
+        const messageDiv = document.getElementById('apiKeyMessage');
+        messageDiv.classList.remove('hidden', 'bg-blue-100', 'bg-green-100', 'bg-red-100', 'bg-yellow-100');
+        messageDiv.classList.remove('text-blue-800', 'text-green-800', 'text-red-800', 'text-yellow-800');
+        
+        const colors = {
+            info: ['bg-blue-100', 'text-blue-800'],
+            success: ['bg-green-100', 'text-green-800'],
+            error: ['bg-red-100', 'text-red-800'],
+            warning: ['bg-yellow-100', 'text-yellow-800']
+        };
+        
+        messageDiv.classList.add(...colors[type]);
+        messageDiv.textContent = message;
+    }
+    
+    function hideApiKeyMessage() {
+        const messageDiv = document.getElementById('apiKeyMessage');
+        if (messageDiv) messageDiv.classList.add('hidden');
+    }
+    
+    function updateApiKeyStatus() {
+        const statusElement = document.getElementById('apiKeyStatus');
+        if (!statusElement) return;
+        
+        if (apiKey && apiKey.length > 0) {
+            statusElement.innerHTML = '✅ API Key Configurada';
+            statusElement.classList.remove('text-yellow-400');
+            statusElement.classList.add('text-green-400');
+        } else {
+            statusElement.innerHTML = '⚠️ API Key No Configurada';
+            statusElement.classList.remove('text-green-400');
+            statusElement.classList.add('text-yellow-400');
+        }
+    }
+    
+    async function testApiKey() {
+        const input = document.getElementById('apiKeyInput');
+        const keyToTest = input.value.trim();
+        
+        if (!keyToTest) {
+            showApiKeyMessage('Por favor, ingresa una API Key', 'warning');
+            return false;
+        }
+        
+        if (!keyToTest.startsWith('AIza')) {
+            showApiKeyMessage('La API Key debe comenzar con "AIza"', 'error');
+            return false;
+        }
+        
+        showApiKeyMessage('🧪 Probando conexión con Google Gemini...', 'info');
+        
+        try {
+            const response = await fetch(GEMINI_API_URL + "?key=" + keyToTest, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: 'Responde solo "OK"' }] }]
+                })
+            });
+
+            if (response.ok) {
+                showApiKeyMessage('✅ ¡API Key válida! Ya puedes guardarla.', 'success');
+                return true;
+            } else {
+                const error = await response.json();
+                showApiKeyMessage('❌ Error: ' + (error.error?.message || 'API Key inválida'), 'error');
+                return false;
+            }
+        } catch (error) {
+            showApiKeyMessage('❌ Error de conexión', 'error');
+            return false;
+        }
+    }
+    
+    async function saveApiKey() {
+        const input = document.getElementById('apiKeyInput');
+        const newKey = input.value.trim();
+        
+        if (!newKey) {
+            showApiKeyMessage('Por favor, ingresa una API Key', 'warning');
+            return;
+        }
+        
+        const isValid = await testApiKey();
+        
+        if (isValid) {
+            apiKey = newKey;
+            localStorage.setItem('geminiApiKey', newKey);
+            showApiKeyMessage('✅ API Key guardada correctamente', 'success');
+            setTimeout(() => closeApiKeyManager(), 1500);
+        }
+    }
+    
+    function deleteApiKey() {
+        if (confirm('¿Estás seguro de eliminar la API Key?')) {
+            apiKey = '';
+            localStorage.removeItem('geminiApiKey');
+            showApiKeyMessage('🗑️ API Key eliminada', 'success');
+            setTimeout(() => showApiKeyManager(), 1000);
+            updateApiKeyStatus();
+        }
+    }
+    
+    // ==================== LLAMADA A GEMINI ====================
+    window.callOpenAI = async function(userMessage, systemPrompt = '') {
+        if (!apiKey) {
+            showApiKeyManager();
+            return null;
+        }
+
+        try {
+            let fullMessage = userMessage;
+            if (systemPrompt) {
+                fullMessage = systemPrompt + "\n\n" + userMessage;
+            }
+
+            const response = await fetch(GEMINI_API_URL + "?key=" + apiKey, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: fullMessage }] }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'Error ' + response.status);
+            }
+
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        } catch (error) {
+            console.error('Error Gemini:', error);
+            return null;
+        }
+    };
+    
+    // Inicializar al cargar
+    updateApiKeyStatus();
+    
+    // ==================== FUNCIÓN DE ANÁLISIS IA ====================
+    async function generateAIAnalysis() {
+        if (!apiKey) {
+            alert('⚠️ Configura tu API Key primero');
+            showApiKeyManager();
+            return;
+        }
+        
+        const button = event.target;
+        const resultDiv = document.getElementById('aiAnalysisResult');
+        
+        if (!resultDiv) {
+            alert('❌ Error: Elemento de análisis no encontrado');
+            return;
+        }
+        
+        // Obtener datos de entrenamientos
+        const workouts = window.workoutHistory || [];
+        
+        if (workouts.length === 0) {
+            resultDiv.innerHTML = `
+                <div class="bg-yellow-50 border border-yellow-200 p-6 rounded-lg">
+                    <p class="text-yellow-800 font-semibold mb-2">⚠️ Sin datos suficientes</p>
+                    <p class="text-yellow-700">Necesitas registrar al menos 2-3 entrenamientos para generar un análisis.</p>
+                    <button onclick="showView('selectRoutine')" class="mt-4 bg-yellow-600 text-white px-6 py-2 rounded-lg hover:bg-yellow-700">
+                        Registrar Entrenamiento
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        // Deshabilitar botón
+        button.disabled = true;
+        button.textContent = '🔄 Analizando...';
+        
+        // Mostrar loading
+        resultDiv.innerHTML = `
+            <div class="bg-blue-50 border border-blue-200 p-6 rounded-lg text-center">
+                <div class="animate-spin text-4xl mb-4">🤖</div>
+                <p class="text-blue-800 font-semibold">Analizando tus entrenamientos...</p>
+                <p class="text-blue-600 text-sm mt-2">Esto puede tomar unos segundos</p>
+            </div>
+        `;
+        
+        try {
+            // Preparar datos para análisis
+            const summary = {
+                totalWorkouts: workouts.length,
+                exercises: {},
+                totalVolume: 0,
+                dateRange: {
+                    first: workouts[0]?.date || 'N/A',
+                    last: workouts[workouts.length - 1]?.date || 'N/A'
+                }
+            };
+            
+            // Procesar cada entrenamiento
+            workouts.forEach(workout => {
+                if (workout.exercises) {
+                    workout.exercises.forEach(exercise => {
+                        if (!summary.exercises[exercise.name]) {
+                            summary.exercises[exercise.name] = {
+                                count: 0,
+                                totalSets: 0,
+                                totalReps: 0,
+                                totalWeight: 0,
+                                maxWeight: 0
+                            };
+                        }
+                        
+                        const ex = summary.exercises[exercise.name];
+                        ex.count++;
+                        
+                        if (exercise.series) {
+                            exercise.series.forEach(serie => {
+                                ex.totalSets++;
+                                ex.totalReps += serie.reps || 0;
+                                ex.totalWeight += (serie.weight || 0) * (serie.reps || 0);
+                                ex.maxWeight = Math.max(ex.maxWeight, serie.weight || 0);
+                                summary.totalVolume += (serie.weight || 0) * (serie.reps || 0);
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Crear prompt para Gemini
+            const prompt = `Eres un entrenador personal experto. Analiza estos datos de entrenamiento y proporciona un análisis detallado en español:
+
+DATOS:
+- Total de entrenamientos: ${summary.totalWorkouts}
+- Período: ${summary.dateRange.first} a ${summary.dateRange.last}
+- Volumen total levantado: ${summary.totalVolume.toFixed(0)} kg
+- Ejercicios realizados: ${Object.keys(summary.exercises).length}
+
+DETALLE POR EJERCICIO:
+${Object.entries(summary.exercises).map(([name, data]) => 
+    `- ${name}: ${data.count} sesiones, ${data.totalSets} series, peso máximo ${data.maxWeight}kg`
+).join('\n')}
+
+Por favor proporciona:
+1. 📊 Resumen del progreso general
+2. ✅ Puntos fuertes (qué está haciendo bien)
+3. ⚠️ Áreas de mejora (desbalances, ejercicios faltantes)
+4. 💪 Recomendaciones específicas (3-5 consejos accionables)
+5. 🎯 Siguiente paso sugerido
+
+Usa emojis y sé específico y motivador.`;
+
+            // Llamar a Gemini
+            const response = await callOpenAI(prompt);
+            
+            if (response) {
+                resultDiv.innerHTML = `
+                    <div class="bg-gradient-to-br from-purple-50 to-indigo-50 border-2 border-purple-200 p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold text-purple-900 mb-6 flex items-center gap-3">
+                            <span class="text-4xl">🤖</span>
+                            Análisis Inteligente por IA
+                        </h3>
+                        <div class="prose prose-lg max-w-none text-gray-800 leading-relaxed whitespace-pre-line">
+                            ${response}
+                        </div>
+                        <div class="mt-6 pt-6 border-t border-purple-200 text-sm text-purple-600">
+                            <p>💡 <strong>Tip:</strong> Guarda este análisis y compáralo con el próximo para ver tu evolución.</p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                throw new Error('No se recibió respuesta de la IA');
+            }
+            
+        } catch (error) {
+            console.error('Error en análisis:', error);
+            resultDiv.innerHTML = `
+                <div class="bg-red-50 border border-red-200 p-6 rounded-lg">
+                    <p class="text-red-800 font-semibold mb-2">❌ Error al generar análisis</p>
+                    <p class="text-red-700">${error.message}</p>
+                    <button onclick="generateAIAnalysis()" class="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700">
+                        Intentar de nuevo
+                    </button>
+                </div>
+            `;
+        } finally {
+            // Rehabilitar botón
+            button.disabled = false;
+            button.textContent = '🤖 Generar Análisis';
+        }
+    }
+    
+    // Hacer función global
+    window.generateAIAnalysis = generateAIAnalysis;
+    
+    // ==================== FORZAR CIERRE DEL CHAT ====================
+    (function() {
+        // Ejecutar inmediatamente
+        const chatBox = document.getElementById('aiChatBox');
+        if (chatBox) {
+            chatBox.classList.add('hidden');
+            chatBox.style.display = 'none';
+            console.log('✅ Chat forzado a ocultar (inmediato)');
+        }
+        
+        // Y también al cargar la página
+        window.addEventListener('load', function() {
+            const chatBox = document.getElementById('aiChatBox');
+            const chatButton = document.getElementById('aiChatButton');
+            
+            if (chatBox) {
+                chatBox.classList.add('hidden');
+                chatBox.style.display = 'none';
+            }
+            
+            if (chatButton) {
+                chatButton.textContent = '🤖';
+            }
+            
+            window.isChatOpen = false;
+            console.log('✅ Chat forzado a ocultar (load event)');
+        });
+    })();
+
+    // ==================== HELPER REGISTRO ====================
+    function handleRegister() {
+        const email = document.getElementById('registerEmail').value;
+        const pass = document.getElementById('registerPassword').value;
+        const confirm = document.getElementById('registerConfirm').value;
+        const errorDiv = document.getElementById('registerError');
+
+        if (pass !== confirm) {
+            errorDiv.textContent = '❌ Las contraseñas no coinciden.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        registerWithCognito(email, pass);
+    }
+    window.handleRegister = handleRegister;
+
+    // Mostrar email del usuario en el menú
+    function updateUserDisplay() {
+        const el = document.getElementById('userEmailDisplay');
+        if (el && currentUser) {
+            el.textContent = appMode === 'demo' ? '🎮 Demo' : currentUser.email;
+        }
+    }
+    window.updateUserDisplay = updateUserDisplay;
+    </script>
+
+    </div> <!-- cierre mainApp -->
+</body>
+</html>
