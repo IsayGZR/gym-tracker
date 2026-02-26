@@ -454,6 +454,12 @@ function enterDemoMode() {
         date: w.date.split('-').reverse().join('/')
     }));
 
+    // Agregar timestamp a cada workout del demo
+    workoutHistory = workoutHistory.map((w, i) => ({
+        ...w,
+        timestamp: new Date(w.date.split('/').reverse().join('-')).getTime() + i
+    }));
+
     // Ocultar login, mostrar pantalla bienvenida
     const loginScreen = document.getElementById('loginScreen');
     const welcomeScreen = document.getElementById('demoWelcomeScreen');

@@ -898,7 +898,7 @@ function showHistoryView() {
         <div class="mb-6">
             <label class="block text-lg font-semibold text-purple-700 mb-3">Selecciona una rutina:</label>
             <select id="routineHistorySelect" onchange="renderRoutineHistory()" 
-                    class="w-full max-w-md p-3 border-2 border-purple-300 rounded-lg focus:border-purple-600 focus:outline-none">
+                    class="w-full max-w-md p-3 border-2 border-purple-300 rounded-lg focus:border-purple-600 focus:outline-none bg-white/10 text-white"
                 <option value="">-- Selecciona --</option>
                 ${routineOptions}
             </select>
