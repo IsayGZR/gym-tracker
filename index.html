@@ -1183,17 +1183,9 @@
     <script src="auth.js"></script>
     <script>
     // ==================== GOOGLE GEMINI INTEGRATION ====================
-    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-    
-    // Actualizar storage key para Gemini
-    apiKey = localStorage.getItem('geminiApiKey') || 'AIzaSyAo-6pjDjpMUDnfjTKTgDaZrnrn7BiqgH0';
-    
-    if (!localStorage.getItem('geminiApiKey')) {
-        localStorage.setItem('geminiApiKey', apiKey);
-        console.log('✅ API Key de Gemini pre-configurada');
-    }
-    
-    console.log('✅ Google Gemini Integration cargada - Modelo: gemini-2.5-flash');
+    const GEMINI_PROXY_URL = "https://glc2hwz6q3.execute-api.us-east-2.amazonaws.com/default/geminiProxy";
+
+    console.log('✅ Google Gemini Integration cargada');
     
     // ==================== FUNCIONES DEL CHAT ====================
     let isChatOpen = false;
@@ -1434,34 +1426,27 @@ Pregunta: ${message}`;
     
     // ==================== LLAMADA A GEMINI ====================
     window.callOpenAI = async function(userMessage, systemPrompt = '') {
-        if (!apiKey) {
-            showApiKeyManager();
-            return null;
-        }
-
         try {
             let fullMessage = userMessage;
             if (systemPrompt) {
                 fullMessage = systemPrompt + "\n\n" + userMessage;
             }
 
-            const response = await fetch(GEMINI_API_URL + "?key=" + apiKey, {
+                const response = await fetch(GEMINI_PROXY_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: fullMessage }] }]
-                })
+                body: JSON.stringify({ prompt: fullMessage })
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error?.message || 'Error ' + response.status);
+                throw new Error(errorData.error || 'Error ' + response.status);
             }
 
             const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
+            return data.text;
         } catch (error) {
-            console.error('Error Gemini:', error);
+                console.error('Error Gemini Proxy:', error);
             return null;
         }
     };
