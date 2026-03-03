@@ -96,11 +96,12 @@ console.log('🔍 DEBUG - Rutinas cargadas:', Object.keys(routines).length)
 // ==================== INICIALIZACIÓN ====================
 // ==================== INICIALIZACIÓN ====================
 async function init() {
-    const dataLoaded = await loadStateFromCloud();
-    
-    // Si no se cargaron datos de ningún lado, iniciar vacío (sin ejemplos)
-    if (!dataLoaded) {
-        console.log('⚠️ No hay datos guardados, iniciando vacío');
+    // Solo cargar desde AWS si hay una sesión real activa
+    if (typeof appMode !== 'undefined' && appMode === 'real') {
+        const dataLoaded = await loadStateFromCloud();
+        if (!dataLoaded) {
+            console.log('⚠️ No hay datos guardados, iniciando vacío');
+        }
     }
     
     if (typeof updateUserDisplay === 'function') updateUserDisplay();
