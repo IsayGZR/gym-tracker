@@ -1184,6 +1184,7 @@
     <script>
     // ==================== GOOGLE GEMINI INTEGRATION ====================
     const GEMINI_PROXY_URL = "https://glc2hwz6q3.execute-api.us-east-2.amazonaws.com/default/geminiProxy";
+    var apiKey = 'proxy'; // La key vive en AWS Lambda
 
     console.log('✅ Google Gemini Integration cargada');
     
@@ -1344,16 +1345,10 @@ Pregunta: ${message}`;
     function updateApiKeyStatus() {
         const statusElement = document.getElementById('apiKeyStatus');
         if (!statusElement) return;
-        
-        if (apiKey && apiKey.length > 0) {
-            statusElement.innerHTML = '✅ API Key Configurada';
-            statusElement.classList.remove('text-yellow-400');
-            statusElement.classList.add('text-green-400');
-        } else {
-            statusElement.innerHTML = '⚠️ API Key No Configurada';
-            statusElement.classList.remove('text-green-400');
-            statusElement.classList.add('text-yellow-400');
-        }
+        // API Key vive en Lambda, siempre activa
+        statusElement.innerHTML = '✅ IA Activa';
+        statusElement.classList.remove('text-yellow-400');
+        statusElement.classList.add('text-green-400');
     }
     
     async function testApiKey() {
@@ -1451,9 +1446,17 @@ Pregunta: ${message}`;
         }
     };
     
+    // Inicializar al cargar
+    updateApiKeyStatus();
     
     // ==================== FUNCIÓN DE ANÁLISIS IA ====================
-    async function generateAIAnalysis() { 
+    async function generateAIAnalysis() {
+        if (!apiKey) {
+            alert('⚠️ Configura tu API Key primero');
+            showApiKeyManager();
+            return;
+        }
+        
         const button = event.target;
         const resultDiv = document.getElementById('aiAnalysisResult');
         
