@@ -1451,17 +1451,9 @@ Pregunta: ${message}`;
         }
     };
     
-    // Inicializar al cargar
-    updateApiKeyStatus();
     
     // ==================== FUNCIÓN DE ANÁLISIS IA ====================
-    async function generateAIAnalysis() {
-        if (!apiKey) {
-            alert('⚠️ Configura tu API Key primero');
-            showApiKeyManager();
-            return;
-        }
-        
+    async function generateAIAnalysis() { 
         const button = event.target;
         const resultDiv = document.getElementById('aiAnalysisResult');
         
